@@ -1,5 +1,5 @@
 // const res = require('express/lib/response');
-const { User } = require('../models');
+const { User, Thought } = require('../models');
 
 const userController =  {
     // get all users
@@ -61,7 +61,7 @@ const userController =  {
     },
     // delete user
     deleteUser({ params }, res) {
-        User.findOneAndDelete({ _id: params.id })
+        User.findOneAndDelete({ _id: params.userId })
         .then(dbUserData => {
             if (!dbUserData) {
                 res.status(404).json({ message: 'no user found with this id' });
@@ -69,7 +69,7 @@ const userController =  {
             }
             res.json(dbUserData);
         })
-        .catch(err => res.status(400).json(err));
+        .catch(err => res.status(400).json(err))
     },
     // add friend
     addFriend({ params, body }, res) {

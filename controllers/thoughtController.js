@@ -47,7 +47,7 @@ const thoughtController = {
             }
             return User.findOneAndUpdate(
                 { _id: params.userId },
-                { $pull: { comments: params.thoughtId }},
+                { $pull: { thoughts: params.thoughtId }},
                 { new: true }
             );
         })
@@ -83,6 +83,19 @@ const thoughtController = {
             console.log(err);
             res.status(400).json(err);
         });
+    },
+    getThoughtById({ params }, res) {
+        Thought.find({ _id: params.thoughtId })
+        .populate({
+            path: 'reactions',
+            select: '-__v'
+        })
+        .select('-__v')
+        .then(dbThoughtData => res.json(dbThoughtData))
+        .catch(err => {
+            console.log(err);
+            res.status(400).json(err);
+        })
     }
 };
 
