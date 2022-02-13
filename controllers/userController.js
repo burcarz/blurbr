@@ -1,4 +1,4 @@
-const res = require('express/lib/response');
+// const res = require('express/lib/response');
 const { User } = require('../models');
 
 const userController =  {
@@ -7,9 +7,11 @@ const userController =  {
         User.find({})
         .populate({
             path: 'friends',
-            select: '-__v'
+            select: '-__v',
+            select: '-password'
         })
         .select('-__v')
+        .select('-password')
         .sort({ _id: -1 })
         .then(dbUserData => res.json(dbUserData))
         .catch(err => {
@@ -19,12 +21,14 @@ const userController =  {
     },
     // get single user
     getUserById({ params }, res) {
-        User.findOne({ _id: params.id })
+        User.findOne({ _id: params.userId })
         .populate({
             path: 'friends',
-            select: '-__v'
+            select: '-__v',
+            select: '-password'
         })
         .select('-__v')
+        .select('-password')
         .then(dbUserData => {
             if (!dbUserData) {
                 res.status(404).json({ message: 'no user found with this id' });
@@ -66,6 +70,38 @@ const userController =  {
             res.json(dbUserData);
         })
         .catch(err => res.status(400).json(err));
+    },
+    // add friend
+    addFriend({ params, body }, res) {
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $push: { friends: params.friendId }},
+            { new: true, runValidators: true }
+        )
+        .then(dbUserData => {
+            if (!dbUserData) {
+                res.status(404).json({ message: 'No friend found with this id' });
+                return;
+            }
+            res.json(dbUserData);
+        })
+        .catch(err => res.json(err))
+    },
+    // delete friend
+    deleteFriend({ params, body }, res) {
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $pull: { friends: params.friendId }},
+            { new: true, runValidators: true }
+        )
+        .then(dbUserData => {
+            if (!dbUserData) {
+                res.status(404).json({ message: 'No friend found with this id' });
+                return;
+            }
+            res.json(dbUserData);
+        })
+        .catch(err => res.json(err))
     }
 };
 

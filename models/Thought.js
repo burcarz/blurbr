@@ -9,9 +9,9 @@ const ReactionSchema = new Schema(
         },
         reactionBody: {
             type: String,
-            required: true
+            required: true,
         },
-        writtenBy: {
+        username: {
             type: String,
             required: true
         },
@@ -31,12 +31,16 @@ const ReactionSchema = new Schema(
 const ThoughtSchema  = new Schema({
     thoughtText: {
         type: String,
-        required: true
+        required: true,
     },
     createdAt: {
         type: Date,
         default: Date.now,
         get: (createdAtVal) => dateFormat(createdAtVal)
+    },
+    username: {
+        type: String,
+        required: true
     },
     reactions: [ReactionSchema]
     },
